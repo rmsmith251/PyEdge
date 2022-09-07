@@ -25,4 +25,7 @@ This is still very much a work in progress so many items aren't implemented.
 - Implement the necessary processors for running the service
 - Implement object detection models
 - Implement object tracking for object detection
+- Implement CLI
+- Implement storage solution (cloud and local)
+- Implement API (maybe)
 - Figure out what else I need to do
