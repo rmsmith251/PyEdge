@@ -5,6 +5,7 @@ import numpy as np
 import timm
 import torch
 import torch.nn as nn
+from pyedge.models.utils import ClassificationConfig
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -21,10 +22,9 @@ def get_imagenet_classes() -> List[str]:
 
 
 class Classification:
-    def __init__(self, model_name: str, num_outputs: int = 5):
-        self.model_name = model_name
-        self.num_outputs = num_outputs
-        self.model = timm.create_model(self.model_name, pretrained=True).to(device)
+    def __init__(self, config: ClassificationConfig):
+        self.config = config
+        self.model = timm.create_model(self.config.model_name, pretrained=True).to(device)
         self.model.eval()
         self.classes = get_imagenet_classes()
 
@@ -42,7 +42,7 @@ class Classification:
                 list(zip(self.classes, np.array(im_pred))),
                 key=lambda x: x[1],
                 reverse=True,
-            )[: self.num_outputs]
+            )[: self.config.num_outputs]
             for im_pred in preds
         ]
 
@@ -53,7 +53,7 @@ class Classification:
 
 
 if __name__ == "__main__":
-    model = Classification("efficientnet_b0")
+    model = Classification()
     num = 3
     ims = [np.random.rand(300, 300, 3).astype(np.float32) for _ in range(num)]
     import time
