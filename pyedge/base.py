@@ -82,7 +82,20 @@ class BaseProcessor:
         if len(self.performance_tracker) > 2000:
             self.performance_tracker = self.performance_tracker[-500:]
 
+    def log(self, text: str, level: str):
+        if level == "info":
+            logging.info(text)
+        elif level == "warning":
+            logging.warning(text)
+        elif level == "error":
+            logging.error(text)
+
     def run_forever(self, input_start_event: Event = None):
+        """
+        Here, the input start event is really only used to hold off on grabbing frames from the
+        streams. OpenCV starts caching as soon as you open the connection so we want to wait until
+        the model has warmed up before we open the connection.
+        """
         pass
 
     def release(self):
