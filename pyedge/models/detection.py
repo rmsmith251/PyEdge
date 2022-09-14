@@ -10,7 +10,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 class ObjectDetection:
-    def __init__(self, config: DetectionConfig, model_type: str = "faster_rcnn", threshold: float = 0.5):
+    def __init__(self, config: DetectionConfig = DetectionConfig()):
         self.config = config
         self.model = MODEL_KEY[self.config.model_name](pretrained=True)
 

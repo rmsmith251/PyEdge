@@ -22,7 +22,7 @@ def get_imagenet_classes() -> List[str]:
 
 
 class Classification:
-    def __init__(self, config: ClassificationConfig):
+    def __init__(self, config: ClassificationConfig = ClassificationConfig()):
         self.config = config
         self.model = timm.create_model(self.config.model_name, pretrained=True).to(device)
         self.model.eval()
