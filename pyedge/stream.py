@@ -1,7 +1,7 @@
 import logging
 import time
 from threading import Event
-from typing import List, Union
+from typing import List, Optional
 
 import cv2
 import numpy as np
@@ -18,8 +18,8 @@ class Resize(BaseModel):
 class Stream(BaseModel):
     name: str
     url: str
-    resize: Union[Resize, None] = None
-    video: Union[cv2.VideoCapture, None] = None
+    resize: Optional[Resize] = None
+    video: Optional[cv2.VideoCapture] = None
 
     def initialize_video(self) -> None:
         self.video = cv2.VideoCapture(self.url)
