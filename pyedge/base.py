@@ -1,7 +1,8 @@
 import logging
 import multiprocessing as mp
 from queue import Queue
-from threading import Event
+
+logger = logging.getLogger(__name__)
 
 
 class BaseProcessor:
@@ -23,28 +24,20 @@ class BaseProcessor:
         self,
         in_q: Queue = None,
         out_q: Queue = None,
-        make_start_event: bool = True,
-        input_start_event: Event = None,
     ):
         self.in_q = in_q
         self.ctx = mp.get_context("spawn")
         self.stop_event = self.ctx.Event()
-        if make_start_event:
-            self.start_event = self.ctx.Event()
-        elif input_start_event is not None:
-            self.start_event = input_start_event
 
         self.out_q = out_q
         if self.out_q is None:
             self.out_q = self.ctx.Queue(maxsize=self.cache)
 
-        self.process = self.ctx.Process(
-            target=self.run_forever, args=(input_start_event,)
-        )
+        self.process = self.ctx.Process(target=self.run_forever)
 
         self.process.daemon = True
         self.process.start()
-        return self.out_q, self.start_event
+        return self.out_q
 
     def _log_performance(self):
         avg_fps = round(
@@ -53,16 +46,16 @@ class BaseProcessor:
             else 0,
             4,
         )
-        logging.info(f"{self.manager_type}: Average FPS: {avg_fps}")
+        logger.info(f"{self.manager_type}: Average FPS: {avg_fps}")
 
     def stop_process(self):
         self._close_objects()
         self.process.join(timeout=15.0)
 
         if self.process.is_alive():  # Ensure it's done
-            logging.warning(f"{self.manager_type}: Backup termination used")
+            logger.warning(f"{self.manager_type}: Backup termination used")
             self.process.terminate()
-        logging.info(f"{self.manager_type}: Background process stopped")
+        logger.info(f"{self.manager_type}: Background process stopped")
         return True
 
     def _close_objects(self):
@@ -75,7 +68,7 @@ class BaseProcessor:
         if "stream" in self.manager_type.lower():
             for name, stream in self.streams.items():
                 stream.release()
-                logging.info(f"Stream: {name=} released")
+                logger.info(f"Stream: {name=} released")
 
     def _track_performance(self, rate):
         self.performance_tracker.append(rate)
@@ -84,13 +77,13 @@ class BaseProcessor:
 
     def log(self, text: str, level: str):
         if level == "info":
-            logging.info(text)
+            logger.info(text)
         elif level == "warning":
-            logging.warning(text)
+            logger.warning(text)
         elif level == "error":
-            logging.error(text)
+            logger.error(text)
 
-    def run_forever(self, input_start_event: Event = None):
+    def run_forever(self):
         """
         Here, the input start event is really only used to hold off on grabbing frames from the
         streams. OpenCV starts caching as soon as you open the connection so we want to wait until
