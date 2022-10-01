@@ -1,13 +1,14 @@
 import logging
 import time
-from threading import Event
 from typing import List, Optional
 
 import cv2
 import numpy as np
 from pydantic import BaseModel, PositiveInt
 
-from .base import BaseProcessor
+from pyedge.base import BaseProcessor
+
+logger = logging.getLogger(__name__)
 
 
 class Resize(BaseModel):
@@ -18,7 +19,7 @@ class Resize(BaseModel):
 class Stream(BaseModel):
     name: str
     url: str
-    resize: Optional[Resize] = None
+    resize: Optional[Resize]
     video: Optional[cv2.VideoCapture] = None
 
     def initialize_video(self) -> None:
@@ -27,12 +28,12 @@ class Stream(BaseModel):
         if not status:
             raise ConnectionError(f"Unable to read frame from {self.url}")
 
-    def read_frame(self) -> np.ndarray:
+    def __call__(self) -> np.ndarray:
         if self.video is None:
             self.initialize_video()
         status, frame = self.video.read()
         if not status:
-            logging.error(f"Error reading from stream {self.url}")
+            logger.error(f"Error reading from stream {self.url}")
             return np.array([])
 
         if self.resize is not None:
@@ -42,9 +43,6 @@ class Stream(BaseModel):
 
     def close(self) -> None:
         self.video.release()
-
-    def __call__(self) -> np.ndarray:
-        return self.read_frame
 
 
 class StreamConfig(BaseModel):
@@ -67,10 +65,7 @@ class StreamProcessor(BaseProcessor):
         for stream in self.streams:
             frames.append(stream())
 
-    def run_forever(self, input_start_event: Event) -> None:
-        # Wait for the model to warm up
-        while not input_start_event.is_set():
-            time.sleep(1)
+    def run_forever(self) -> None:
 
         while not self.stop_event.is_set():
             start = time.time()

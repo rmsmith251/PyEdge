@@ -1,7 +1,7 @@
+import logging
 import time
 from copy import deepcopy
 from queue import Empty
-from threading import Event
 from typing import Dict, List, Tuple
 
 import numpy as np
@@ -10,9 +10,11 @@ from pyedge.base import BaseProcessor
 from pyedge.models import Classification, ModelConfig, ObjectDetection
 from pyedge.utils import Message
 
+logger = logging.getLogger(__name__)
+
 
 class ModelProcessor(BaseProcessor):
-    def __init__(self, config: ModelConfig):
+    def __init__(self, config: ModelConfig = ModelConfig()):
         super().__init__()
 
         self.config = config
@@ -47,7 +49,7 @@ class ModelProcessor(BaseProcessor):
 
         return messages
 
-    def run_forever(self, input_start_event: Event = None):
+    def run_forever(self):
         """
         Try to avoid adding unnecessary processing here. The bottleneck will
         almost always be the model so let other processes handle other work.

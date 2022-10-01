@@ -24,12 +24,14 @@ def get_imagenet_classes() -> List[str]:
 class Classification:
     def __init__(self, config: ClassificationConfig = ClassificationConfig()):
         self.config = config
-        self.model = timm.create_model(self.config.model_name, pretrained=True).to(device)
+        self.model = timm.create_model(self.config.model_name, pretrained=True).to(
+            device
+        )
         self.model.eval()
         self.classes = get_imagenet_classes()
 
         # Warm up
-        self([np.random.rand(300, 300, 3).astype(np.float32) for _ in range(5)])
+        self([np.random.rand(500, 500, 3).astype(np.float32) for _ in range(5)])
 
     def preprocess(self, images: List[np.ndarray]):
         images = torch.from_numpy(np.array(images)).to(device)
