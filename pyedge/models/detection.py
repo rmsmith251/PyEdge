@@ -2,15 +2,20 @@ from typing import List
 
 import numpy as np
 import torch
+from pyedge.models.base import BaseInferenceModel
 import torchvision.models.detection as detection
-from pyedge.models.utils import DetectionConfig
+from pydantic import BaseModel
 
 MODEL_KEY = {"faster_rcnn": detection.fasterrcnn_resnet50_fpn}
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
+class DetectionConfig(BaseModel):
+    model_name: str = "faster_rcnn"
+    threshold: float = 0.5
 
-class ObjectDetection:
+class ObjectDetection(BaseInferenceModel):
     def __init__(self, config: DetectionConfig = DetectionConfig()):
+        super().__init__()
         self.config = config
         self.model = MODEL_KEY[self.config.model_name](pretrained=True)
 

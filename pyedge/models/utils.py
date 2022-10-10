@@ -1,18 +1,8 @@
 from typing import Optional
 
 from pydantic import BaseModel
-from pyedge.models.classification import Classification
-from pyedge.models.detection import ObjectDetection
-
-
-class ClassificationConfig(BaseModel):
-    model_name: str = "efficientnet_b0"
-    num_outputs: int = 5
-
-
-class DetectionConfig(BaseModel):
-    model_name: str = "faster_rcnn"
-    threshold: float = 0.5
+from pyedge.models.classification import Classification, ClassificationConfig
+from pyedge.models.detection import ObjectDetection, DetectionConfig
 
 
 class ModelConfig(BaseModel):

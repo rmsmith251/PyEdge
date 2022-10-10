@@ -5,7 +5,8 @@ import numpy as np
 import timm
 import torch
 import torch.nn as nn
-from pyedge.models.utils import ClassificationConfig
+from pydantic import BaseModel
+from pyedge.models.base import BaseInferenceModel
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -21,8 +22,13 @@ def get_imagenet_classes() -> List[str]:
     return categories
 
 
-class Classification:
+class ClassificationConfig(BaseModel):
+    model_name: str = "efficientnet_b0"
+    num_outputs: int = 5
+
+class Classification(BaseInferenceModel):
     def __init__(self, config: ClassificationConfig = ClassificationConfig()):
+        super().__init__()
         self.config = config
         self.model = timm.create_model(self.config.model_name, pretrained=True).to(
             device
