@@ -7,7 +7,9 @@ from typing import Dict, List, Tuple
 import numpy as np
 
 from pyedge.base import BaseProcessor
-from pyedge.models import Classification, ModelConfig, ObjectDetection
+from pyedge.models.classification import Classification
+from pyedge.models.utils import ModelConfig
+from pyedge.models.detection import ObjectDetection
 from pyedge.utils import Message
 
 logger = logging.getLogger(__name__)
@@ -57,6 +59,8 @@ class ModelProcessor(BaseProcessor):
         while not self.stop_event.is_set():
             start = time.time()
             images, messages = self.get_batch()
+            if not images:
+                continue
             preds = self.model(images)
             messages = self.unbatch(messages, preds)
             self.out_q.put(messages)
