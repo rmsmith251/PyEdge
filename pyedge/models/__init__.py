@@ -1,1 +1,1 @@
-from .utils import ModelConfig
+from .config import ModelConfig
