@@ -16,22 +16,22 @@ class Resize(BaseModel):
     width: PositiveInt = 500
 
 
-class Stream(BaseModel):
+class Stream(BaseModel, arbitrary_types_allowed=True, extra='allow'):
     name: str
     url: str
     resize: Optional[Resize]
-    video: Optional[cv2.VideoCapture] = None
+    _video: Optional[cv2.VideoCapture] = None
 
     def initialize_video(self) -> None:
-        self.video = cv2.VideoCapture(self.url)
-        status, _ = self.video.read()
+        self._video = cv2.VideoCapture(self.url)
+        status, _ = self._video.read()
         if not status:
             raise ConnectionError(f"Unable to read frame from {self.url}")
 
     def __call__(self) -> np.ndarray:
-        if self.video is None:
+        if self._video is None:
             self.initialize_video()
-        status, frame = self.video.read()
+        status, frame = self._video.read()
         if not status:
             logger.error(f"Error reading from stream {self.url}")
             return np.array([])
@@ -42,7 +42,7 @@ class Stream(BaseModel):
         return frame
 
     def close(self) -> None:
-        self.video.release()
+        self._video.release()
 
 
 class StreamConfig(BaseModel):

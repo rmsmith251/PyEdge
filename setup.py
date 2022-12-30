@@ -25,7 +25,7 @@ setup(
     name="PyEdge",
     version="0.0.1",
     author="Ryan Smith",
-    author_email="rsmith@plainsight.ai",
+    author_email="ryanmsmith251@gmail.com",
     url="https://github.com/rmsmith251/PyEdge",
     packages=setuptools.find_packages(),
     package_data={"pyedge": ["py.typed"]},
