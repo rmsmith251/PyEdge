@@ -5,7 +5,21 @@ import setuptools
 with open("README.md") as f:
     long_description = f.read()
 
-extras_include = {}
+extras_include = {
+    "dev": [
+        "docker-compose",
+        "flake8",
+        "black",
+        "isort",
+        "mypy",
+        "pytest",
+        "pytest-benchmark",
+    ],
+}
+
+extras_include["all"] = [
+    *extras_include["dev"],
+]
 
 setup(
     name="PyEdge",
@@ -22,18 +36,21 @@ setup(
     install_requires=[
         "click==8.0.4",
         "fsspec[gs]",
+        "torch",
         "torchvision",
         "numpy",
         "opencv-python",
         "pydantic",
         "ftfy",
         "scipy",
-        "huggingface-hub",
+        # "huggingface-hub",
         "timm",
+        "fastapi",
+        "uvicorn",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.9",
+    python_requires=">=3.8",
 )
